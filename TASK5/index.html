@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather App</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background:url("cloudy.gif");
+        background-position: center;
+        background-size: cover;
+    }
+    .container {
+        padding: 2em;
+        margin: 1em;
+        text-align: center;
+        background: rgba(0, 0, 0, 0);
+        border-radius: 16px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(18.2px);
+        -webkit-backdrop-filter: blur(18.2px);
+        border: 1px solid rgba(0, 0, 0, 0.01);
+        }
+</style>
+</head>
+<body>
+<div class="container">
+    <input type="text" id="locationInput" placeholder="Enter Location">
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="weatherInfo"></div>
+</div>
+<script>
+    async function getWeather() {
+        const locationInput = document.getElementById('locationInput').value;
+        let url;
+        if (locationInput) {
+            url = `https://api.openweathermap.org/data/2.5/weather?q=${locationInput}&appid=ecafa70af4f72ef145d31890cd5aaf17&units=metric`;
+        } 
+        else {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser');
+            }
+            navigator.geolocation.getCurrentPosition(position => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=ecafa70af4f72ef145d31890cd5aaf17&units=metric`;
+                fetchWeather(url);
+            }, error => {
+                alert('Unable to retrieve your location');
+            });
+        }
+        fetchWeather(url);
+    }
+
+    async function fetchWeather(url) {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            console.log(data);
+            const weatherInfo = document.getElementById('weatherInfo');
+            weatherInfo.innerHTML = `
+                <h2>${data.name}, ${data.sys.country}</h2>
+                <p>Temperature: ${data.main.temp}°C</p>
+                <p>Weather: ${data.weather[0].description}</p>
+                <p>Humidity: ${data.main.humidity}%</p>
+                <p>Wind Speed: ${data.wind.speed} m/s</p>`;
+            imgChange(data.weather[0].main);
+        } catch (error) {
+            console.error('Error fetching weather data:', error);
+            alert('Failed to fetch weather data');
+        }
+    }
+    function imgChange(weather){
+        let body = document.querySelector("body");
+        if (weather === "Clouds"){
+            console.log(weather);
+            body.style.background = 'url("cloudy.gif")';
+            body.style.backgroundPosition =  'center';
+            body.style.backgroundSize = 'cover';
+        }
+        else if (weather === "Clear"){
+            body.style.background = 'url("ClearSky.gif")';
+            body.style.backgroundPosition =  'center';
+            body.style.backgroundSize = 'cover';
+        }
+        else if (weather === "Snow"){
+            body.style.background = 'url("Snow.gif")';
+            body.style.backgroundPosition =  'center';
+            body.style.backgroundSize = 'cover';
+        }
+        else if (weather === "Rain"){
+            body.style.background = 'url("rainny.gif")';
+            body.style.backgroundPosition =  'center';
+            body.style.backgroundSize = 'cover';
+        }
+        else if (weather === "Drizzle"){
+            body.style.background = 'url("Rain.gif")';
+            body.style.backgroundPosition =  'center';
+            body.style.backgroundSize = 'cover';
+        }
+        else if (weather === "Thunderstorm"){
+            body.style.background = 'url("Thunderstrom.gif")';
+            body.style.backgroundPosition =  'center';
+            body.style.backgroundSize = 'cover';
+        }
+    }
+</script>
+</body>
+</html>
